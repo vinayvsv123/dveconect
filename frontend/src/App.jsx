@@ -11,8 +11,9 @@ function App() {
   return (
     
     <BrowserRouter>
-    <Navbar/>
 
+      <Navbar/>
+    
       <Routes>
         <Route path='/' element={<AuthPage/>}/>
         <Route path='/explore' element={<ExplorePage/>}/>
