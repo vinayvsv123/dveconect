@@ -5,6 +5,7 @@ import ExplorePage from './pages/Explore.jsx';
 import ProfilePage from './pages/Profile.jsx';
 import ProjectDetailPage from './pages/ProjectDetailPage.jsx';
 import AuthPage from './pages/Auth.jsx';
+import AddProjectPage from './pages/AddProjecct.jsx';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
         <Route path='/explore' element={<ExplorePage/>}/>
         <Route path='/profile' element={<ProfilePage/>}/>
         <Route path='/project/:id' element={<ProjectDetailPage/>}/>
+        <Route path='/add-project' element={<AddProjectPage/>}/>
         
       </Routes>
     </BrowserRouter>
