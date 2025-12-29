@@ -58,7 +58,7 @@ return (
             {/* Description */}
             <p className="text-gray-300 mb-4">
                <span className="text-gray-400 font-medium">Description:</span>{" "}
-               {project.description}
+               <span className="text-white">{project.description}</span>
             </p>
 
 
