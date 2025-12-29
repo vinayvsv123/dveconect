@@ -13,18 +13,20 @@ function Navbar() {
         {/* Links */}
         <div className="flex items-center gap-6">
           <Link
+            to="/"
+            className="text-gray-300 hover:text-white transition"
+          >
+            About
+          </Link>
+          
+          <Link
             to="/explore"
             className="text-gray-300 hover:text-white transition"
           >
             Explore
           </Link>
 
-          <Link
-            to="/"
-            className="text-gray-300 hover:text-white transition"
-          >
-            About
-          </Link>
+          
 
           <Link
             to="/auth"

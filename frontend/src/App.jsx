@@ -5,7 +5,7 @@ import ExplorePage from './pages/Explore.jsx';
 import ProfilePage from './pages/Profile.jsx';
 import ProjectDetailPage from './pages/ProjectDetailPage.jsx';
 import AuthPage from './pages/Auth.jsx';
-import AddProjectPage from './pages/AddProjecct.jsx';
+import AddProjectPage from './pages/AddProject.jsx';
 
 
 function App() {
