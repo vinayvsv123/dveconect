@@ -2,26 +2,23 @@ import mongoose from 'mongoose';
 
 const userSchema=new mongoose.Schema(
     {
-        name:{
-            type:String,
-            required:true,
+            username:{
+                type:String,
+                required:true,
+                //unique:true,
+            },
+            email:{
+                type:String,
+                unique:true,
+                required:true,
+            // match:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+            },
+            password:{
+                type:String,
+                required:true,
+              //  unique:true,
+            },
         },
-        email:{
-            type:String,
-            required:true,
-            unique:true,
-            lowercase:true,
-        },
-        password:{
-            type:String,
-            required:true,
-            unique:true,
-        }
-
-     },
-     {timeStamps:true}
-
-    }
-)
-
+    {timestamps:true}
+);
 export const User=mongoose.model("User",userSchema);
