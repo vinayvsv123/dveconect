@@ -32,7 +32,7 @@ export const registerUser=async(req,res)=>{
            res.status(500).json({message:"Server error"});
      }
 
-    }
+    };
 
     //login 
     export const loginuser=async(req,res)=>{
@@ -55,6 +55,12 @@ export const registerUser=async(req,res)=>{
             {
                 return res.status(401).json({message:"Invalid credentials"});
             }
+            const token=jwt.sign(
+                {userId:user._id},
+                process.env.JWT_SECRET,
+                {expiresIn:'1h'}
+            )
+            res.status(200).json({message:"Login successful",token,username:user.username});
 
 
         }
@@ -63,4 +69,4 @@ export const registerUser=async(req,res)=>{
             console.error("Error logging in user:",error);
             res.status(500).json({message:"Server error"});
         }
-    }
+    };
