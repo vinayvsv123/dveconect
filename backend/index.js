@@ -8,8 +8,7 @@ dotenv.config();  // load .env
 connectDB();      // connect MongoDB
 
 //user route
-app.use('/api/users',userRoutes);
-app.use('/api/projects',projectRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

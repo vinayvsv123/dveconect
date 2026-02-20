@@ -60,7 +60,15 @@ export const registerUser=async(req,res)=>{
                 process.env.JWT_SECRET,
                 {expiresIn:'1h'}
             )
-            res.status(200).json({message:"Login successful",token,username:user.username});
+            res.status(200).json({
+            token,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email
+            }
+            });
+           // res.status(200).json({message:"Login successful",token,username:user.username});
 
 
         }

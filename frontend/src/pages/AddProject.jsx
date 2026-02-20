@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { createProject } from "../services/api";
 function AddProjectPage() {
   const navigate = useNavigate();
 
@@ -8,8 +8,9 @@ function AddProjectPage() {
     title: "",
     description: "",
     skills: "",
-    postedBy: "",
   });
+
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -18,19 +19,27 @@ function AddProjectPage() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newProject = {
-      ...formData,
-      skills: formData.skills.split(",").map((s) => s.trim()),
-    };
+    try {
+      setLoading(true);
 
-    console.log("New Project:", newProject);
+      const projectData = {
+        title: formData.title,
+        description: formData.description,
+        skills: formData.skills.split(",").map((s) => s.trim()),
+      };
 
-    // later → send to backend
-    // for now → just redirect
-    navigate("/explore");
+      await createProject(projectData);
+
+      navigate("/explore");
+    } catch (error) {
+      console.error(error);
+      alert("Error creating project");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,6 +50,7 @@ function AddProjectPage() {
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
+
           {/* Project Title */}
           <div>
             <label className="block text-sm text-gray-400 mb-2">
@@ -76,7 +86,7 @@ function AddProjectPage() {
           {/* Skills */}
           <div>
             <label className="block text-sm text-gray-400 mb-2">
-              Skills Required
+              Skills Required (comma separated)
             </label>
             <input
               type="text"
@@ -89,22 +99,6 @@ function AddProjectPage() {
             />
           </div>
 
-          {/* Posted By */}
-          <div>
-            <label className="block text-sm text-gray-400 mb-2">
-              Posted By
-            </label>
-            <input
-              type="text"
-              name="postedBy"
-              value={formData.postedBy}
-              onChange={handleChange}
-              required
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500"
-              placeholder="Your name"
-            />
-          </div>
-
           {/* Buttons */}
           <div className="flex gap-4 justify-end">
             <button
@@ -114,13 +108,16 @@ function AddProjectPage() {
             >
               Cancel
             </button>
+
             <button
               type="submit"
-              className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition"
+              disabled={loading}
+              className="px-6 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 transition disabled:opacity-50"
             >
-              Add Project
+              {loading ? "Adding..." : "Add Project"}
             </button>
           </div>
+
         </form>
       </div>
     </div>

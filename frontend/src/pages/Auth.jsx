@@ -1,28 +1,68 @@
-import React, { useState } from "react";
+import React, { useEffect,useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from "lucide-react";
+import {loginUser,registerUser} from "../services/api";
 
 function AuthPages() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/explore");
+    }
+  }, [navigate]);
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
-    name: "",
+    username: "",
     email: "",
     password: "",
   });
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log(formData);
-  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+
+      if (isLogin) 
+        {
+          const data = await loginUser({
+            email: formData.email,
+            password: formData.password,
+          });
+
+          localStorage.setItem("token", data.token);
+
+          navigate("/explore");
+        }
+    else 
+      {
+        await registerUser({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        });
+
+        alert("Registration successful. Please login.");
+        setIsLogin(true);
+      }
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
-
-      {/* Auth Card */}
       <div className="w-full max-w-md bg-slate-900/70 backdrop-blur border border-slate-700 rounded-2xl p-8 text-white">
 
         {/* Header */}
@@ -37,17 +77,17 @@ function AuthPages() {
           </p>
         </div>
 
-        {/* Form */}
         <form className="space-y-5" onSubmit={handleSubmit}>
           {!isLogin && (
             <div className="relative">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
-                name="name"
-                value={formData.name}
+                name="username"
+                value={formData.username}
                 onChange={handleChange}
-                placeholder="Full Name"
+                required
+                placeholder="Username"
                 className="w-full pl-12 pr-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500"
               />
             </div>
@@ -60,6 +100,7 @@ function AuthPages() {
               name="email"
               value={formData.email}
               onChange={handleChange}
+              required
               placeholder="Email"
               className="w-full pl-12 pr-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500"
             />
@@ -72,6 +113,7 @@ function AuthPages() {
               name="password"
               value={formData.password}
               onChange={handleChange}
+              required
               placeholder="Password"
               className="w-full pl-12 pr-12 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500"
             />
@@ -84,45 +126,16 @@ function AuthPages() {
             </button>
           </div>
 
-          {isLogin && (
-            <div className="flex justify-between text-sm text-gray-400">
-              <label className="flex items-center gap-2">
-                <input type="checkbox" className="accent-blue-600" />
-                Remember me
-              </label>
-              <span className="hover:text-blue-400 cursor-pointer">
-                Forgot password?
-              </span>
-            </div>
-          )}
-
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition"
+            disabled={loading}
+            className="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition disabled:opacity-50"
           >
-            {isLogin ? "Login" : "Sign Up"}
+            {loading ? "Please wait..." : isLogin ? "Login" : "Sign Up"}
             <ArrowRight size={18} />
           </button>
         </form>
 
-        {/* Divider */}
-        <div className="my-6 flex items-center gap-4 text-gray-500 text-sm">
-          <div className="flex-1 h-px bg-slate-700"></div>
-          OR
-          <div className="flex-1 h-px bg-slate-700"></div>
-        </div>
-
-        {/* Social buttons */}
-        <div className="grid grid-cols-2 gap-3">
-          <button className="py-3 rounded-lg bg-slate-800 border border-slate-700 hover:border-blue-500 transition">
-            Google
-          </button>
-          <button className="py-3 rounded-lg bg-slate-800 border border-slate-700 hover:border-blue-500 transition">
-            GitHub
-          </button>
-        </div>
-
-        {/* Toggle */}
         <p className="mt-6 text-center text-sm text-gray-400">
           {isLogin ? "Don’t have an account?" : "Already have an account?"}
           <button
