@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 // Register a new user
 export const registerUser=async(req,res)=>{
     try{
+            console.log("Registering user with data:", req.body);
             const{username,email,password}=req.body;
             if(!username||!email||!password){
                     return res.status(400).json({message:"Please provide all required fields"});

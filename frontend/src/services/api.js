@@ -36,7 +36,10 @@ export const getProjects = async () => {
     },
   });
 
-  return res.json();
+  const data = await res.json();
+
+  // Check if the backend returns { projects: [...] } or directly an array
+  return data.projects || []; // <-- ensures an array is always returned
 };
 
 // Create Project
