@@ -36,10 +36,13 @@ export const getProjects = async () => {
     },
   });
 
+  if (!res.ok) {
+    throw new Error("Failed to fetch projects");
+  }
+
   const data = await res.json();
 
-  // Check if the backend returns { projects: [...] } or directly an array
-  return data.projects || []; // <-- ensures an array is always returned
+  return data; // ✅ return directly
 };
 
 // Create Project

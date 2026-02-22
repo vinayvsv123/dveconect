@@ -1,16 +1,11 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight } from "lucide-react";
-import {loginUser,registerUser} from "../services/api";
+import { loginUser, registerUser } from "../services/api";
 
 function AuthPages() {
   const navigate = useNavigate();
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      navigate("/explore");
-    }
-  }, [navigate]);
+
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -20,6 +15,14 @@ function AuthPages() {
     email: "",
     password: "",
   });
+
+  // ✅ Redirect if already logged in
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token && token !== "undefined") {
+      navigate("/explore");
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,31 +34,39 @@ function AuthPages() {
     try {
       setLoading(true);
 
-      if (isLogin) 
-        {
-          const data = await loginUser({
-            email: formData.email,
-            password: formData.password,
-          });
+      if (isLogin) {
+        // 🔥 LOGIN
+        const data = await loginUser({
+          email: formData.email,
+          password: formData.password,
+        });
 
+        console.log("Login response:", data);
+
+        if (data && data.token) {
           localStorage.setItem("token", data.token);
-
           navigate("/explore");
+        } else {
+          alert("Login failed. Please check your credentials.");
         }
-    else 
-      {
-        await registerUser({
+
+      } else {
+        // 🔥 REGISTER
+        const data = await registerUser({
           username: formData.username,
           email: formData.email,
           password: formData.password,
         });
 
+        console.log("Register response:", data);
+
         alert("Registration successful. Please login.");
         setIsLogin(true);
       }
+
     } catch (error) {
-      console.error(error);
-      alert(error.response?.data?.message || "Something went wrong");
+      console.error("Auth error:", error);
+      alert("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -78,6 +89,7 @@ function AuthPages() {
         </div>
 
         <form className="space-y-5" onSubmit={handleSubmit}>
+
           {!isLogin && (
             <div className="relative">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />

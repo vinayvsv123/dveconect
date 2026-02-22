@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getProjects } from "../services/api";
 
 function ExplorePage() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [connectedProjects, setConnectedProjects] = useState({});
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -20,6 +22,20 @@ function ExplorePage() {
 
     fetchProjects();
   }, []);
+
+  const handleConnect = (projectId) => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    setConnectedProjects((prev) => ({
+      ...prev,
+      [projectId]: true,
+    }));
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 to-slate-900 text-white pt-28 px-6">
@@ -65,12 +81,22 @@ function ExplorePage() {
                 <p className="text-sm text-gray-400">
                   Posted By:{" "}
                   <span className="text-white font-medium">
-                    {project.postedBy?.name || "Unknown"}
+                    {project.postedBy?.username || "Unknown"}
                   </span>
                 </p>
 
-                <button className="bg-blue-600 hover:bg-blue-700 px-5 py-2 rounded-lg transition">
-                  Connect
+                <button
+                  onClick={() => handleConnect(project._id)}
+                  disabled={connectedProjects[project._id]}
+                  className={`px-5 py-2 rounded-lg transition ${
+                    connectedProjects[project._id]
+                      ? "bg-green-600 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700"
+                  }`}
+                >
+                  {connectedProjects[project._id]
+                    ? "Connected"
+                    : "Connect"}
                 </button>
               </div>
             </div>
