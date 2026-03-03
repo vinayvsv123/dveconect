@@ -33,6 +33,9 @@ function Navbar() {
               <Link to="/profile" className="text-gray-300 hover:text-white transition">
                 Profile
               </Link>
+              <Link to="/chat" className="text-gray-300 hover:text-white transition">
+                Messages
+              </Link>
               <button
                 onClick={handleLogout}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition"

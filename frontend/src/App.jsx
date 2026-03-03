@@ -6,6 +6,7 @@ import ProfilePage from './pages/Profile.jsx';
 import ProjectDetailPage from './pages/ProjectDetailPage.jsx';
 import AuthPage from './pages/Auth.jsx';
 import AddProjectPage from './pages/AddProject.jsx';
+import ChatPage from './pages/Chat.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 
 function App() {
@@ -31,6 +32,15 @@ function App() {
           element={
             <ProtectedRoute>
               <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+              <ChatPage />
             </ProtectedRoute>
           }
         />

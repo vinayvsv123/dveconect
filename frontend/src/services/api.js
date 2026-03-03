@@ -1,5 +1,5 @@
-const BASE_URL = "https://devconect-pcgp.onrender.com/api";
-
+//const BASE_URL = "https://devconect-pcgp.onrender.com/api";
+const BASE_URL = "http://localhost:5000/api";
 // Register
 export const registerUser = async (userData) => {
   const res = await fetch(`${BASE_URL}/users/register`, {
@@ -42,7 +42,7 @@ export const getProjects = async () => {
 
   const data = await res.json();
 
-  return data; // ✅ return directly
+  return data;
 };
 
 // Create Project
@@ -58,5 +58,69 @@ export const createProject = async (projectData) => {
     body: JSON.stringify(projectData),
   });
 
+  return res.json();
+};
+
+// ─── Profile APIs ────────────────────────────────────────
+
+// Get current user profile
+export const getProfile = async () => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${BASE_URL}/users/profile`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to fetch profile");
+  return res.json();
+};
+
+// Update current user profile
+export const updateProfile = async (profileData) => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${BASE_URL}/users/profile`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(profileData),
+  });
+  if (!res.ok) throw new Error("Failed to update profile");
+  return res.json();
+};
+
+// ─── Chat APIs ───────────────────────────────────────────
+
+// Get all users (for chat list)
+export const getAllUsers = async () => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${BASE_URL}/users`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to fetch users");
+  return res.json();
+};
+
+// Get messages between current user and another user
+export const getMessages = async (userId) => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${BASE_URL}/chats/${userId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Failed to fetch messages");
+  return res.json();
+};
+
+// Send message via HTTP (fallback)
+export const sendMessageHTTP = async (receiverId, text) => {
+  const token = localStorage.getItem("token");
+  const res = await fetch(`${BASE_URL}/chats`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ receiverId, text }),
+  });
+  if (!res.ok) throw new Error("Failed to send message");
   return res.json();
 };
