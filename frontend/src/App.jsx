@@ -8,6 +8,7 @@ import AuthPage from './pages/Auth.jsx';
 import AddProjectPage from './pages/AddProject.jsx';
 import ChatPage from './pages/Chat.jsx';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
+import ResetPassword from './pages/ResetPassword.jsx';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
       <Routes>
         <Route path="/" element={<AboutPage />} />
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
 
         <Route
           path="/explore"

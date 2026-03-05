@@ -124,3 +124,49 @@ export const sendMessageHTTP = async (receiverId, text) => {
   if (!res.ok) throw new Error("Failed to send message");
   return res.json();
 };
+
+// ─── Password & OAuth APIs ───────────────────────────────
+
+export const forgotPassword = async (email) => {
+  const res = await fetch(`${BASE_URL}/users/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to send reset email");
+  return data;
+};
+
+export const resetPassword = async (token, password) => {
+  const res = await fetch(`${BASE_URL}/users/reset-password/${token}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to reset password");
+  return data;
+};
+
+export const googleLogin = async (googleToken) => {
+  const res = await fetch(`${BASE_URL}/users/oauth/google`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ googleToken }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to login with Google");
+  return data;
+};
+
+export const githubLogin = async (code) => {
+  const res = await fetch(`${BASE_URL}/users/oauth/github`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ code }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.message || "Failed to login with GitHub");
+  return data;
+};

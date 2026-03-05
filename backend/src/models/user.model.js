@@ -11,12 +11,11 @@ const userSchema = new mongoose.Schema(
             type: String,
             unique: true,
             required: true,
-           match:/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+            match: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
         },
         password: {
             type: String,
-            required: true,
-            //  unique:true,
+            // required: true,
         },
         bio: { type: String, default: '' },
         profilePicture: { type: String, default: '' },
