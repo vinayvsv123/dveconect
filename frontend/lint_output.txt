@@ -1,0 +1,10 @@
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+C:\Users\vedul\OneDrive\Desktop\devconnect\frontend\src\pages\Auth.jsx
+  109:15  error  'data' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+✖ 1 problem (1 error, 0 warnings)
+

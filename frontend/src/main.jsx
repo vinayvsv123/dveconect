@@ -5,7 +5,8 @@ import './index.css'
 import App from './App.jsx'
 
 // In a real app, use import.meta.env.VITE_GOOGLE_CLIENT_ID
-const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID";
+ const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+ //const GOOGLE_CLIENT_ID="YOUR_GOOGLE_CLIENT_ID"
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
