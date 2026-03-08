@@ -1,5 +1,6 @@
 //const BASE_URL = "https://devconect-pcgp.onrender.com/api";
-const BASE_URL = "http://localhost:5000/api";
+//const BASE_URL = "http://localhost:5000/api";
+const BASE_URL = "https://devconect-1.onrender.com/api";
 // Register
 export const registerUser = async (userData) => {
   const res = await fetch(`${BASE_URL}/users/register`, {
