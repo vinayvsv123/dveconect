@@ -15,8 +15,8 @@ router.post('/oauth/google', googleOAuth);
 router.post('/oauth/github', githubOAuth);
 
 // Password Reset routes
-router.post('/forgot-password', forgotPassword);
-router.post('/reset-password/:token', resetPassword);
+//router.post('/forgot-password', forgotPassword);
+//router.post('/reset-password/:token', resetPassword);
 
 // Profile routes
 router.get('/profile', authMiddleware, getProfile);

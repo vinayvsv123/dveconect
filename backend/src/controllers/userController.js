@@ -142,31 +142,55 @@ export const forgotPassword = async (req, res) => {
         const resetUrl = `http://localhost:5173/reset-password/${resetToken}`;
 
         // Attempt to send email but gracefully degrade if unconfigured
-        const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST || 'smtp.ethereal.email',
-            port: process.env.SMTP_PORT || 587,
-            auth: {
-                user: process.env.SMTP_USER || 'fake_user',
-                pass: process.env.SMTP_PASS || 'fake_pass'
-            }
-        });
+        let transporter;
+        let isTestAccount = false;
+
+        if (process.env.SMTP_USER && process.env.SMTP_USER !== 'yourgmail@gmail.com') {
+            transporter = nodemailer.createTransport({
+                host: process.env.SMTP_HOST || 'smtp.gmail.com',
+                port: process.env.SMTP_PORT || 587,
+                auth: {
+                    user: process.env.SMTP_USER,
+                    pass: process.env.SMTP_PASS
+                }
+            });
+        } else {
+            console.log("No valid SMTP credentials detected. Generating an Ethereal test account...");
+            const testAccount = await nodemailer.createTestAccount();
+            transporter = nodemailer.createTransport({
+                host: "smtp.ethereal.email",
+                port: 587,
+                secure: false, // true for 465, false for other ports
+                auth: {
+                    user: testAccount.user, // generated ethereal user
+                    pass: testAccount.pass, // generated ethereal password
+                },
+            });
+            isTestAccount = true;
+        }
 
         const message = `You are receiving this email because you requested the reset of a password.\n\nPlease go to this link to reset it:\n${resetUrl}`;
 
         try {
-            if (process.env.SMTP_USER) {
-                await transporter.sendMail({
-                    from: `${process.env.FROM_NAME || 'Admin'} <${process.env.SMTP_USER || 'admin@devconnect.com'}>`,
-                    to: user.email,
-                    subject: 'Password reset token',
-                    text: message
-                });
-            } else {
-                console.log('Sending email suppressed (no SMTP credentials). Reset Link:', resetUrl);
+            const info = await transporter.sendMail({
+                from: `${process.env.FROM_NAME || 'Admin'} <${process.env.SMTP_USER !== 'yourgmail@gmail.com' ? process.env.SMTP_USER : 'admin@devconnect.com'}>`,
+                to: user.email,
+                subject: 'Password reset token',
+                text: message
+            });
+
+            console.log("Message sent: %s", info.messageId);
+
+            let previewUrl = null;
+            if (isTestAccount) {
+                previewUrl = nodemailer.getTestMessageUrl(info);
+                console.log("Preview URL (Click here to view the email!): %s", previewUrl);
             }
+
             res.status(200).json({
-                message: "Email sent",
-                resetToken: process.env.NODE_ENV !== 'production' && !process.env.SMTP_USER ? resetToken : undefined
+                message: "Email sent successfully",
+                previewUrl: process.env.NODE_ENV !== 'production' ? previewUrl : undefined,
+                resetToken: process.env.NODE_ENV !== 'production' ? resetToken : undefined
             });
         } catch (err) {
             console.error("Email send fail:", err);
@@ -232,39 +256,46 @@ export const googleOAuth = async (req, res) => {
 
 // GitHub OAuth
 export const githubOAuth = async (req, res) => {
+    console.log("GitHub OAuth called with body:", req.body);
+
     try {
         const { code } = req.body;
 
-        // 1. Exchange code for access token using client id & secret from env
-        const tokenRes = await axios.post("https://github.com/login/oauth/access_token", {
-            client_id: process.env.VITE_GITHUB_CLIENT_ID || process.env.GITHUB_CLIENT_ID,
-            client_secret: process.env.GITHUB_CLIENT_SECRET,
-            code
-        }, {
-            headers: { Accept: "application/json" }
-        });
+        const tokenRes = await axios.post(
+            "https://github.com/login/oauth/access_token",
+            {
+                client_id: process.env.GITHUB_CLIENT_ID,
+                client_secret: process.env.GITHUB_CLIENT_SECRET,
+                code
+            },
+            {
+                headers: { Accept: "application/json" }
+            }
+        );
 
         const accessToken = tokenRes.data.access_token;
+
         if (!accessToken) {
             return res.status(400).json({ message: "Failed to authenticate with GitHub" });
         }
 
-        // 2. Fetch user profile
         const userRes = await axios.get("https://api.github.com/user", {
-            headers: { Authorization: `Bearer ${accessToken}` }
+            headers: { Authorization: `token ${accessToken}` }
         });
 
-        // 3. Fetch user emails
         const emailRes = await axios.get("https://api.github.com/user/emails", {
-            headers: { Authorization: `Bearer ${accessToken}` }
+            headers: { Authorization: `token ${accessToken}` }
         });
 
-        const primaryEmail = emailRes.data.find(e => e.primary)?.email || userRes.data.email;
+        const primaryEmail =
+            emailRes.data.find(e => e.primary)?.email || userRes.data.email;
+
         if (!primaryEmail) {
             return res.status(400).json({ message: "GitHub account must have an email" });
         }
 
         let user = await User.findOne({ email: primaryEmail });
+
         if (!user) {
             user = new User({
                 username: userRes.data.login,
@@ -272,14 +303,27 @@ export const githubOAuth = async (req, res) => {
                 profilePicture: userRes.data.avatar_url,
                 githubUrl: userRes.data.html_url
             });
+
             await user.save();
         }
 
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET || 'dev_secret_key', { expiresIn: '1h' });
-        res.status(200).json({ token, user: { id: user._id, username: user.username, email: user.email } });
+        const token = jwt.sign(
+            { userId: user._id },
+            process.env.JWT_SECRET || "dev_secret_key",
+            { expiresIn: "1h" }
+        );
+
+        res.status(200).json({
+            token,
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email
+            }
+        });
 
     } catch (error) {
-        console.error("Github OAuth error:", error.message);
+        console.error("Github OAuth error:", error.response?.data || error);
         res.status(500).json({ message: "GitHub authentication failed" });
     }
 };

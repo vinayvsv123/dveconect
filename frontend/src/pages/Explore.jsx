@@ -5,8 +5,15 @@ import { getProjects } from "../services/api";
 function ExplorePage() {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [connectedProjects, setConnectedProjects] = useState({});
+  const [connectedProjects, setConnectedProjects] = useState(() => {
+    const saved = localStorage.getItem("connectedProjects");
+    return saved ? JSON.parse(saved) : {};
+  });
   const navigate = useNavigate();
+
+  useEffect(() => {
+    localStorage.setItem("connectedProjects", JSON.stringify(connectedProjects));
+  }, [connectedProjects]);
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -85,19 +92,28 @@ function ExplorePage() {
                   </span>
                 </p>
 
-                <button
-                  onClick={() => handleConnect(project._id)}
-                  disabled={connectedProjects[project._id]}
-                  className={`px-5 py-2 rounded-lg transition ${
-                    connectedProjects[project._id]
-                      ? "bg-green-600 cursor-not-allowed"
-                      : "bg-blue-600 hover:bg-blue-700"
-                  }`}
-                >
-                  {connectedProjects[project._id]
-                    ? "Connected"
-                    : "Connect"}
-                </button>
+                <div className="flex items-center gap-3">
+                  {connectedProjects[project._id] && (
+                    <button
+                      onClick={() => navigate('/chat')}
+                      className="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 transition font-medium"
+                    >
+                      Message
+                    </button>
+                  )}
+                  <button
+                    onClick={() => handleConnect(project._id)}
+                    disabled={connectedProjects[project._id]}
+                    className={`px-5 py-2 rounded-lg transition font-medium ${connectedProjects[project._id]
+                        ? "bg-green-600 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700"
+                      }`}
+                  >
+                    {connectedProjects[project._id]
+                      ? "Connected"
+                      : "Connect"}
+                  </button>
+                </div>
               </div>
             </div>
           ))}

@@ -31,16 +31,17 @@ function AuthPages() {
           if (data && data.token) {
             localStorage.setItem("token", data.token);
             navigate("/explore");
+          } else {
+            navigate("/auth", { replace: true });
           }
         })
         .catch(err => {
           console.error("GitHub Login Error", err);
           alert("GitHub login failed.");
+          navigate("/auth", { replace: true });
         })
         .finally(() => {
           setLoading(false);
-          // clear code from url
-          navigate("/auth", { replace: true });
         });
     } else {
       const token = localStorage.getItem("token");
@@ -54,10 +55,7 @@ function AuthPages() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // using original GoogleLogin component directly
-
   const handleGithubLoginBtn = () => {
-    // Navigate to github oauth page
     const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID || "YOUR_GITHUB_CLIENT_ID";
     window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user:email`;
   };
@@ -108,46 +106,24 @@ function AuthPages() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
-      <div className="w-full max-w-md bg-slate-900/70 backdrop-blur border border-slate-700 rounded-2xl p-8 text-white">
+      <div className="w-full max-w-md bg-slate-900/80 backdrop-blur border border-slate-700 rounded-2xl p-8 text-white">
 
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2 text-white">
+        {/* Header */}
+        <div className="text-center mb-6">
+          <h1 className="text-3xl font-bold text-white">
             {view === "forgotPassword" ? "Reset Password" : "Welcome to DevConnect"}
           </h1>
-          <p className="text-gray-400 text-sm">
+          <p className="text-gray-400 text-sm mt-1">
             {view === "forgotPassword"
               ? "Enter your email to receive a reset link"
               : "Discover projects, connect with developers."}
           </p>
         </div>
 
-        {view !== "forgotPassword" && (
-          <div className="flex bg-slate-800/50 p-1 rounded-xl mb-8">
-            <button
-              onClick={() => setView("login")}
-              className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${view === "login"
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
-                  : "text-gray-400 hover:text-gray-200 hover:bg-slate-700/50"
-                }`}
-            >
-              Sign In
-            </button>
-            <button
-              onClick={() => setView("register")}
-              className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${view === "register"
-                  ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
-                  : "text-gray-400 hover:text-gray-200 hover:bg-slate-700/50"
-                }`}
-            >
-              Sign Up
-            </button>
-          </div>
-        )}
-
         {message && <div className="mb-4 text-red-400 text-sm text-center">{message}</div>}
 
-        <form className="space-y-5" onSubmit={handleSubmit}>
-
+        {/* Form */}
+        <form className="space-y-4" onSubmit={handleSubmit}>
           {view === "register" && (
             <div className="relative">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -198,6 +174,7 @@ function AuthPages() {
             </div>
           )}
 
+          {/* 
           {view === "login" && (
             <div className="flex justify-end">
               <button
@@ -209,27 +186,35 @@ function AuthPages() {
               </button>
             </div>
           )}
+          */}
 
           <button
             type="submit"
             disabled={loading}
             className="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition disabled:opacity-50"
           >
-            {loading ? "Please wait..." : view === "login" ? "Sign In" : view === "register" ? "Sign Up" : "Send Reset Link"}
+            {loading
+              ? "Please wait..."
+              : view === "login"
+                ? "Sign In"
+                : view === "register"
+                  ? "Sign Up"
+                  : "Send Reset Link"}
             <ArrowRight size={18} />
           </button>
         </form>
 
+        {/* OAuth Buttons */}
         {(view === "login" || view === "register") && (
           <div className="mt-6">
-            <div className="relative flex items-center py-5">
+            <div className="relative flex items-center py-4">
               <div className="flex-grow border-t border-slate-700"></div>
-              <span className="flex-shrink-0 mx-4 text-slate-500 text-sm">Or continue with</span>
+              <span className="flex-shrink-0 mx-3 text-slate-500 text-sm">Or continue with</span>
               <div className="flex-grow border-t border-slate-700"></div>
             </div>
 
-            <div className="flex flex-col gap-4">
-              <div className="flex justify-center w-full">
+            <div className="flex gap-4 justify-center">
+              <div className="flex-1">
                 <GoogleLogin
                   onSuccess={(credentialResponse) => {
                     setLoading(true);
@@ -254,24 +239,43 @@ function AuthPages() {
                   width="100%"
                 />
               </div>
+
               <button
                 onClick={handleGithubLoginBtn}
                 type="button"
-                className="flex items-center justify-center gap-2 py-2 w-full px-4 border border-slate-700 bg-slate-800 rounded-lg hover:bg-slate-700 transition"
+                className="flex-1 flex items-center justify-center gap-2 py-2 px-4 border border-slate-700 bg-slate-800 rounded-lg hover:bg-slate-700 transition"
               >
                 <Github className="w-5 h-5" />
-                Sign in with GitHub
+                GitHub
               </button>
             </div>
           </div>
         )}
 
+        {/* Toggle Sign In / Sign Up */}
+        {view !== "forgotPassword" && (
+          <p className="mt-6 text-center text-sm text-gray-400">
+            {view === "login"
+              ? "Don't have an account?"
+              : "Already have an account?"}
+            <button
+              onClick={() => setView(view === "login" ? "register" : "login")}
+              className="ml-2 text-blue-400 hover:text-blue-300 font-medium"
+            >
+              {view === "login" ? "Sign Up" : "Sign In"}
+            </button>
+          </p>
+        )}
+
         {view === "forgotPassword" && (
           <p className="mt-6 text-center text-sm text-gray-400">
             Remember your password?
-            <button onClick={() => setView("login")} className="ml-2 text-blue-400 hover:text-blue-300 font-medium">Back to Sign In</button>
+            <button onClick={() => setView("login")} className="ml-2 text-blue-400 hover:text-blue-300 font-medium">
+              Back to Sign In
+            </button>
           </p>
         )}
+
       </div>
     </div>
   );
