@@ -6,18 +6,31 @@ import chatRoutes from './src/routes/chatRoutes.js';
 
 const app = express();
 
-// 1. Apply CORS before all routes
+// Allow both local dev and deployed frontend
+const allowedOrigins = [
+  'http://localhost:5173', 
+  'https://dveconect-gv4m.vercel.app'
+];
+
 app.use(cors({
-  origin: 'http://localhost:5173', // your frontend
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like Postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('CORS not allowed for this origin'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'], // include Authorization
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
 
 // Parse JSON bodies
 app.use(express.json());
 
-//  2. Routes
+// Routes
 app.use('/api/users', userRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/chats', chatRoutes);
