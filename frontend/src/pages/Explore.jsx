@@ -34,7 +34,7 @@ function ExplorePage() {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      navigate("/login");
+      navigate("/auth");
       return;
     }
 
@@ -105,8 +105,8 @@ function ExplorePage() {
                     onClick={() => handleConnect(project._id)}
                     disabled={connectedProjects[project._id]}
                     className={`px-5 py-2 rounded-lg transition font-medium ${connectedProjects[project._id]
-                        ? "bg-green-600 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700"
+                      ? "bg-green-600 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700"
                       }`}
                   >
                     {connectedProjects[project._id]
