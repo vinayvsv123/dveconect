@@ -12,7 +12,7 @@ router.post('/login', loginUser);
 
 // OAuth routes
 router.post('/oauth/google', googleOAuth);
-router.post('/oauth/github', githubOAuth);
+router.get('/oauth/github', githubOAuth);
 
 // Password Reset routes
 //router.post('/forgot-password', forgotPassword);
