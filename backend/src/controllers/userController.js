@@ -256,10 +256,10 @@ export const googleOAuth = async (req, res) => {
 
 // GitHub OAuth
 export const githubOAuth = async (req, res) => {
-    console.log("GitHub OAuth called with body:", req.body);
+    console.log("GitHub OAuth called with query:", req.query);
 
     try {
-        const { code } = req.body;
+        const { code } = req.query;
 
         const tokenRes = await axios.post(
             "https://github.com/login/oauth/access_token",
