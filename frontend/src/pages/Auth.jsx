@@ -23,8 +23,16 @@ function AuthPages() {
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const code = params.get("code");
+    const token = params.get("token");
+    const errorParam = params.get("error");
 
-    if (code) {
+    if (errorParam) {
+      setMessage("GitHub login failed: " + errorParam.replace(/_/g, " "));
+      navigate("/auth", { replace: true });
+    } else if (token) {
+      localStorage.setItem("token", token);
+      navigate("/explore");
+    } else if (code) {
       setLoading(true);
       githubLogin(code)
         .then((data) => {
@@ -44,8 +52,8 @@ function AuthPages() {
           setLoading(false);
         });
     } else {
-      const token = localStorage.getItem("token");
-      if (token && token !== "undefined") {
+      const existingToken = localStorage.getItem("token");
+      if (existingToken && existingToken !== "undefined") {
         navigate("/explore");
       }
     }
@@ -105,12 +113,12 @@ function AuthPages() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
-      <div className="w-full max-w-md bg-slate-900/80 backdrop-blur border border-slate-700 rounded-2xl p-8 text-white">
+    <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8 md:py-12 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+      <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl bg-slate-900/80 backdrop-blur-md border border-slate-700 rounded-2xl p-6 sm:p-8 md:p-10 text-white shadow-2xl">
 
         {/* Header */}
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-white">
+        <div className="text-center mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight">
             {view === "forgotPassword" ? "Reset Password" : "Welcome to DevConnect"}
           </h1>
           <p className="text-gray-400 text-sm mt-1">
@@ -123,7 +131,7 @@ function AuthPages() {
         {message && <div className="mb-4 text-red-400 text-sm text-center">{message}</div>}
 
         {/* Form */}
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit}>
           {view === "register" && (
             <div className="relative">
               <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -134,7 +142,7 @@ function AuthPages() {
                 onChange={handleChange}
                 required
                 placeholder="Username"
-                className="w-full pl-12 pr-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500"
+                className="w-full pl-12 pr-4 py-3 sm:py-3.5 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500 transition-colors"
               />
             </div>
           )}
@@ -148,7 +156,7 @@ function AuthPages() {
               onChange={handleChange}
               required
               placeholder="Email"
-              className="w-full pl-12 pr-4 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500"
+              className="w-full pl-12 pr-4 py-3 sm:py-3.5 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500 transition-colors"
             />
           </div>
 
@@ -162,7 +170,7 @@ function AuthPages() {
                 onChange={handleChange}
                 required
                 placeholder="Password"
-                className="w-full pl-12 pr-12 py-3 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500"
+                className="w-full pl-12 pr-12 py-3 sm:py-3.5 rounded-lg bg-slate-800 border border-slate-700 focus:outline-none focus:border-blue-500 transition-colors"
               />
               <button
                 type="button"
@@ -191,7 +199,7 @@ function AuthPages() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition disabled:opacity-50"
+            className="w-full bg-blue-600 hover:bg-blue-700 py-3 sm:py-3.5 mt-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50 text-base sm:text-lg"
           >
             {loading
               ? "Please wait..."
@@ -213,8 +221,8 @@ function AuthPages() {
               <div className="flex-grow border-t border-slate-700"></div>
             </div>
 
-            <div className="flex gap-4 justify-center">
-              <div className="flex-1">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center w-full">
+              <div className="w-full sm:flex-1 h-10">
                 <GoogleLogin
                   onSuccess={(credentialResponse) => {
                     setLoading(true);
@@ -243,7 +251,7 @@ function AuthPages() {
               <button
                 onClick={handleGithubLoginBtn}
                 type="button"
-                className="flex-1 flex items-center justify-center gap-2 py-2 px-4 border border-slate-700 bg-slate-800 rounded-lg hover:bg-slate-700 transition"
+                className="w-full sm:flex-1 flex items-center justify-center gap-2 h-10 px-4 border border-slate-700 bg-slate-800 rounded-lg hover:bg-slate-700 transition shadow-sm"
               >
                 <Github className="w-5 h-5" />
                 GitHub

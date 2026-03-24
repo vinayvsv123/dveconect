@@ -276,7 +276,7 @@ export const githubOAuth = async (req, res) => {
         const accessToken = tokenRes.data.access_token;
 
         if (!accessToken) {
-            return res.status(400).json({ message: "Failed to authenticate with GitHub" });
+            return res.redirect(`http://localhost:5173/auth?error=github_auth_failed`);
         }
 
         const userRes = await axios.get("https://api.github.com/user", {
@@ -291,7 +291,7 @@ export const githubOAuth = async (req, res) => {
             emailRes.data.find(e => e.primary)?.email || userRes.data.email;
 
         if (!primaryEmail) {
-            return res.status(400).json({ message: "GitHub account must have an email" });
+            return res.redirect(`http://localhost:5173/auth?error=github_no_email`);
         }
 
         let user = await User.findOne({ email: primaryEmail });
@@ -313,17 +313,10 @@ export const githubOAuth = async (req, res) => {
             { expiresIn: "1h" }
         );
 
-        res.status(200).json({
-            token,
-            user: {
-                id: user._id,
-                username: user.username,
-                email: user.email
-            }
-        });
+        res.redirect(`http://localhost:5173/auth?token=${token}`);
 
     } catch (error) {
         console.error("Github OAuth error:", error.response?.data || error);
-        res.status(500).json({ message: "GitHub authentication failed" });
+        res.redirect(`http://localhost:5173/auth?error=github_server_error`);
     }
 };

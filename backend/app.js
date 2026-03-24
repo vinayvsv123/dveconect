@@ -6,6 +6,8 @@ import chatRoutes from './src/routes/chatRoutes.js';
 
 const app = express();
 
+
+
 // Allow both local dev and deployed frontend
 const allowedOrigins = [
   'http://localhost:5173', 
@@ -34,6 +36,7 @@ app.use(express.json());
 app.use('/api/users', userRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/chats', chatRoutes);
+
 
 app.get('/', (req, res) => res.send('Hello World'));
 
