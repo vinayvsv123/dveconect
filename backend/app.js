@@ -10,8 +10,8 @@ const app = express();
 
 // Allow both local dev and deployed frontend
 const allowedOrigins = [
-  'http://localhost:5173', 
-  'https://dveconect-gv4m.vercel.app'
+  'http://localhost:5173',
+  'https://dveconect-52tl.vercel.app'
 ];
 
 app.use(cors({
