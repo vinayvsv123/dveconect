@@ -63,10 +63,11 @@ function AuthPages() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleGithubLoginBtn = () => {
-    const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID || "YOUR_GITHUB_CLIENT_ID";
-    window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user:email`;
-  };
+ const handleGithubLoginBtn = () => {
+  const clientId = import.meta.env.VITE_GITHUB_CLIENT_ID || "YOUR_GITHUB_CLIENT_ID";
+  const redirectUri = "https://devconect-1.onrender.com/api/users/oauth/github";
+  window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&scope=user:email&redirect_uri=${redirectUri}`;
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
